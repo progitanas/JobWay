@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobWay - Découvre ton futur métier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.js"></script>
+    <style>
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        
+        .transform {
+            transform: translateZ(0);
+        }
+        
+        .hover\:scale-105:hover {
+            transform: scale(1.05);
+        }
+        
+        .bg-gradient-to-r {
+            background: linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-to));
+        }
+        
+        .bg-gradient-to-br {
+            background: linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to));
+        }
+        
+        .from-blue-50 {
+            --tw-gradient-from: #eff6ff;
+        }
+        
+        .to-purple-50 {
+            --tw-gradient-to: #faf5ff;
+        }
+        
+        .from-blue-500 {
+            --tw-gradient-from: #3b82f6;
+        }
+        
+        .to-purple-600 {
+            --tw-gradient-to: #9333ea;
+        }
+        
+        .from-blue-600 {
+            --tw-gradient-from: #2563eb;
+        }
+        
+        .to-purple-700 {
+            --tw-gradient-to: #7c3aed;
+        }
+        
+        .from-red-500 {
+            --tw-gradient-from: #ef4444;
+        }
+        
+        .to-orange-500 {
+            --tw-gradient-to: #f97316;
+        }
+        
+        .from-green-400 {
+            --tw-gradient-from: #4ade80;
+        }
+        
+        .to-blue-500 {
+            --tw-gradient-to: #3b82f6;
+        }
+        
+        .bg-clip-text {
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        
+        .text-transparent {
+            color: transparent;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 50;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 42rem;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <!-- Header -->
+    <header class="bg-white shadow-lg border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg">
+                        <i data-lucide="briefcase" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            JobWay
+                        </h1>
+                        <p class="text-xs text-gray-600">Découvre ton futur métier</p>
+                    </div>
+                </div>
+                
+                <nav class="flex space-x-8">
+                    <button onclick="setActiveTab('missions')" class="tab-button flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 bg-blue-100 text-blue-700 font-semibold" data-tab="missions">
+                        <i data-lucide="target" class="w-5 h-5"></i>
+                        <span>Missions</span>
+                    </button>
+                    <button onclick="setActiveTab('profile')" class="tab-button flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 text-gray-600 hover:text-blue-600 hover:bg-blue-50" data-tab="profile">
+                        <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+                        <span>Profil</span>
+                    </button>
+                    <button onclick="setActiveTab('certificates')" class="tab-button flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 text-gray-600 hover:text-blue-600 hover:bg-blue-50" data-tab="certificates">
+                        <i data-lucide="award" class="w-5 h-5"></i>
+                        <span>Certificats</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Missions Tab -->
+        <div id="missions-tab" class="tab-content">
+            <!-- Search and Filters -->
+            <div class="mb-8 bg-white rounded-xl shadow-lg p-6">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1 relative">
+                        <i data-lucide="search" class="absolute left-3 top-3 w-5 h-5 text-gray-400"></i>
+                        <input
+                            type="text"
+                            id="search-input"
+                            placeholder="Rechercher par titre, entreprise ou compétence..."
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="category-filter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="all">Toutes catégories</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Tech">Tech</option>
+                            <option value="RH">RH</option>
+                            <option value="Data">Data</option>
+                        </select>
+                        <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center space-x-2">
+                            <i data-lucide="filter" class="w-4 h-4"></i>
+                            <span>Filtrer</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">247</div>
+                    <div class="text-gray-600">Missions disponibles</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">1,284</div>
+                    <div class="text-gray-600">Étudiants inscrits</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-purple-600 mb-2">96%</div>
+                    <div class="text-gray-600">Taux de satisfaction</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-orange-600 mb-2">€450</div>
+                    <div class="text-gray-600">Rémunération moyenne</div>
+                </div>
+            </div>
+
+            <!-- Mission Cards -->
+            <div id="missions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Mission cards will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="profile-tab" class="tab-content hidden">
+            <div class="space-y-8">
+                <!-- Profile Header -->
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <div class="flex items-center space-x-6 mb-6">
+                        <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                            JD
+                        </div>
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-800">Jean Dupont</h2>
+                            <p class="text-gray-600">Étudiant en Master Marketing Digital</p>
+                            <div class="flex items-center space-x-2 mt-2">
+                                <div class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                    Expert Junior
+                                </div>
+                                <div class="flex items-center space-x-1">
+                                    <i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                                    <span class="text-sm font-medium">4.9/5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-gray-100 hover:border-blue-300 transition-all duration-300">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 rounded-full bg-green-500">
+                                    <i data-lucide="check-circle" class="w-6 h-6 text-white"></i>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-gray-800">12</div>
+                                    <div class="text-sm text-gray-600">Missions terminées</div>
+                                </div>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="h-2 rounded-full bg-green-400" style="width: 24%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-gray-100 hover:border-blue-300 transition-all duration-300">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 rounded-full bg-blue-500">
+                                    <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-gray-800">28</div>
+                                    <div class="text-sm text-gray-600">Compétences acquises</div>
+                                </div>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="h-2 rounded-full bg-blue-400" style="width: 56%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-gray-100 hover:border-blue-300 transition-all duration-300">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 rounded-full bg-purple-500">
+                                    <i data-lucide="award" class="w-6 h-6 text-white"></i>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-gray-800">5</div>
+                                    <div class="text-sm text-gray-600">Certificats obtenus</div>
+                                </div>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="h-2 rounded-full bg-purple-400" style="width: 10%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-gray-100 hover:border-blue-300 transition-all duration-300">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 rounded-full bg-orange-500">
+                                    <i data-lucide="zap" class="w-6 h-6 text-white"></i>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-gray-800">Expert</div>
+                                    <div class="text-sm text-gray-600">Niveau d'expérience</div>
+                                </div>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="h-2 rounded-full bg-orange-400" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills Progress -->
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Progression des compétences</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-32 text-sm font-medium text-gray-700">Marketing Digital</div>
+                            <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                <div class="h-3 rounded-full bg-blue-500 transition-all duration-500" style="width: 85%"></div>
+                            </div>
+                            <div class="text-sm font-semibold text-gray-600">85%</div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-32 text-sm font-medium text-gray-700">Développement Web</div>
+                            <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                <div class="h-3 rounded-full bg-green-500 transition-all duration-500" style="width: 72%"></div>
+                            </div>
+                            <div class="text-sm font-semibold text-gray-600">72%</div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-32 text-sm font-medium text-gray-700">Gestion de Projet</div>
+                            <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                <div class="h-3 rounded-full bg-purple-500 transition-all duration-500" style="width: 90%"></div>
+                            </div>
+                            <div class="text-sm font-semibold text-gray-600">90%</div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-32 text-sm font-medium text-gray-700">Analyse de Données</div>
+                            <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                <div class="h-3 rounded-full bg-orange-500 transition-all duration-500" style="width: 65%"></div>
+                            </div>
+                            <div class="text-sm font-semibold text-gray-600">65%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificates Tab -->
+        <div id="certificates-tab" class="tab-content hidden">
+            <div class="space-y-8">
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Mes Certificats</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border-2 border-gray-100 hover:border-blue-300 transition-all duration-300">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="px-3 py-1 rounded-full text-sm font-semibold bg-orange-100 text-orange-700">
+                                    Bronze
+                                </div>
+                                <i data-lucide="award" class="w-8 h-8 text-blue-500"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Marketing Digital</h3>
+                            <p class="text-gray-600 text-sm mb-4">Obtenu le 2025-06-15</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">SEO</span>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Social Media</span>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Analytics</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border-2 border-gray-100 hover:border-blue-300 transition-all duration-300">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-700">
+                                    Argent
+                                </div>
+                                <i data-lucide="award" class="w-8 h-8 text-blue-500"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Développement Web</h3>
+                            <p class="text-gray-600 text-sm mb-4">Obtenu le 2025-05-20</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">HTML</span>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">CSS</span>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">JavaScript</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border-2 border-gray-100 hover:border-blue-300 transition-all duration-300">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-700">
+                                    Or
+                                </div>
+                                <i data-lucide="award" class="w-8 h-8 text-blue-500"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Gestion de Projet</h3>
+                            <p class="text-gray-600 text-sm mb-4">Obtenu le 2025-04-10</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Agile</span>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Scrum</span>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Leadership</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mission Detail Modal -->
+    <div id="mission-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div id="modal-logo" class="text-4xl">🚀</div>
+                        <div>
+                            <h2 id="modal-title" class="text-2xl font-bold text-gray-800">Mission Title</h2>
+                            <p id="modal-company" class="text-gray-600 font-medium">Company Name</p>
+                        </div>
+                    </div>
+                    <button onclick="closeModal()" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                        <span class="text-2xl">×</span>
+                    </button>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <div class="text-sm text-gray-600">Durée</div>
+                            <div id="modal-duration" class="font-semibold">7 jours</div>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <div class="text-sm text-gray-600">Rémunération</div>
+                            <div id="modal-salary" class="font-semibold text-green-600">350€</div>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <div class="text-sm text-gray-600">Lieu</div>
+                            <div id="modal-location" class="font-semibold">Paris 9ème</div>
+                        </div>
+                        <div class="bg-orange-50 p-4 rounded-lg">
+                            <div class="text-sm text-gray-600">Début</div>
+                            <div id="modal-start-date" class="font-semibold">2025-07-25</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Description de la mission</h3>
+                        <p id="modal-description" class="text-gray-700 leading-relaxed">Description here...</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Compétences développées</h3>
+                        <div id="modal-skills" class="flex flex-wrap gap-2">
+                            <!-- Skills will be inserted here -->
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button class="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105">
+                            Postuler maintenant
+                        </button>
+                        <button id="modal-like-btn" onclick="toggleMissionLike()" class="p-3 rounded-lg border-2 border-gray-300 bg-gray-50 text-gray-600 hover:border-red-300 hover:bg-red-50 transition-all duration-200">
+                            <i data-lucide="heart" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let activeTab = 'missions';
+        let searchTerm = '';
+        let filterCategory = 'all';
+        let likedMissions = new Set();
+        let selectedMission = null;
+        
+        const missions = [
+            {
+                id: 1,
+                title: "Assistant Marketing Digital",
+                company: "TechStart Solutions",
+                location: "Paris 9ème",
+                duration: "7 jours",
+                startDate: "2025-07-25",
+                category: "Marketing",
+                skills: ["Social Media", "Analytics", "Canva"],
+                description: "Participe à la création de campagnes digitales et analyse les performances sur les réseaux sociaux.",
+                salary: "350€",
+                difficulty: "Débutant",
+                rating: 4.8,
+                applicants: 23,
+                logo: "🚀",
+                urgent: false,
+                featured: true
+            },
+            {
+                id: 2,
+                title: "Développeur Frontend Junior",
+                company: "WebCorp",
+                location: "Lyon",
+                duration: "10 jours",
+                startDate: "2025-08-01",
+                category: "Tech",
+                skills: ["React", "CSS", "JavaScript"],
+                description: "Développe des interfaces utilisateur modernes et participe aux revues de code avec l'équipe.",
+                salary: "600€",
+                difficulty: "Intermédiaire",
+                rating: 4.9,
+                applicants: 45,
+                logo: "💻",
+                urgent: true,
+                featured: false
+            },
+            {
+                id: 3,
+                title: "Assistant Ressources Humaines",
+                company: "People First",
+                location: "Bordeaux",
+                duration: "5 jours",
+                startDate: "2025-07-30",
+                category: "RH",
+                skills: ["Recrutement", "Communication", "Excel"],
+                description: "Assiste dans le processus de recrutement et participe aux entretiens d'embauche.",
+                salary: "300€",
+                difficulty: "Débutant",
+                rating: 4.6,
+                applicants: 18,
+                logo: "👥",
+                urgent: false,
+                featured: false
+            },
+            {
+                id: 4,
+                title: "Consultant Data Analyst",
+                company: "DataViz Pro",
+                location: "Toulouse",
+                duration: "8 jours",
+                startDate: "2025-08-05",
+                category: "Data",
+                skills: ["Python", "SQL", "Tableau"],
+                description: "Analyse des données clients et création de tableaux de bord interactifs.",
+                salary: "500€",
+                difficulty: "Avancé",
+                rating: 4.7,
+                applicants: 31,
+                logo: "📊",
+                urgent: false,
+                featured: true
+            }
+        ];
+
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            renderMissions();
+            
+            // Add event listeners
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                searchTerm = e.target.value;
+                renderMissions();
+            });
+            
+            document.getElementById('category-filter').addEventListener('change', (e) => {
+                filterCategory = e.target.value;
+                renderMissions();
+            });
+        });
+
+        function setActiveTab(tab) {
+            // Update active tab
+            activeTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.className = btn.className.replace('bg-blue-100 text-blue-700 font-semibold', 'text-gray-600 hover:text-blue-600 hover:bg-blue-50');
+            });
+            
+            document.querySelector(`[data-tab="${tab}"]`).className = 'tab-button flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 bg-blue-100 text-blue-700 font-semibold';
+            
+            // Show/hide tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.ad
+                              content.classList.add('hidden');
+            });
+            document.getElementById(`${tab}-tab`).classList.remove('hidden');
+        }
+
+        function renderMissions() {
+            const missionsGrid = document.getElementById('missions-grid');
+            missionsGrid.innerHTML = '';
+            
+            const filteredMissions = missions.filter(mission => {
+                // Filter by search term
+                const matchesSearch = 
+                    mission.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    mission.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    mission.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
+                
+                // Filter by category
+                const matchesCategory = filterCategory === 'all' || mission.category === filterCategory;
+                
+                return matchesSearch && matchesCategory;
+            });
+            
+            if (filteredMissions.length === 0) {
+                missionsGrid.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <i data-lucide="search-x" class="w-12 h-12 mx-auto text-gray-400 mb-4"></i>
+                        <h3 class="text-xl font-semibold text-gray-700">Aucune mission trouvée</h3>
+                        <p class="text-gray-500">Essayez de modifier vos critères de recherche</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            filteredMissions.forEach(mission => {
+                const missionCard = document.createElement('div');
+                missionCard.className = `bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 ${mission.featured ? 'border-2 border-blue-500' : ''} ${mission.urgent ? 'border-l-4 border-red-500' : ''}`;
+                missionCard.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="text-4xl">${mission.logo}</div>
+                            <div class="flex items-center space-x-1">
+                                <i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                                <span class="text-sm font-medium">${mission.rating}</span>
+                            </div>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">${mission.title}</h3>
+                        <p class="text-gray-600 font-medium mb-3">${mission.company}</p>
+                        
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            ${mission.skills.map(skill => `<span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">${skill}</span>`).join('')}
+                        </div>
+                        
+                        <p class="text-gray-700 line-clamp-2 mb-4">${mission.description}</p>
+                        
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-sm text-gray-600">${mission.duration}</span>
+                                <span class="mx-2 text-gray-300">•</span>
+                                <span class="text-sm font-semibold text-green-600">${mission.salary}</span>
+                            </div>
+                            <button onclick="openMissionModal(${mission.id})" class="text-blue-600 hover:text-blue-800 font-medium">
+                                Voir plus
+                            </button>
+                        </div>
+                    </div>
+                `;
+                missionsGrid.appendChild(missionCard);
+            });
+            
+            lucide.createIcons();
+        }
+
+        function openMissionModal(missionId) {
+            const mission = missions.find(m => m.id === missionId);
+            if (!mission) return;
+            
+            selectedMission = mission;
+            
+            // Update modal content
+            document.getElementById('modal-logo').textContent = mission.logo;
+            document.getElementById('modal-title').textContent = mission.title;
+            document.getElementById('modal-company').textContent = mission.company;
+            document.getElementById('modal-duration').textContent = mission.duration;
+            document.getElementById('modal-salary').textContent = mission.salary;
+            document.getElementById('modal-location').textContent = mission.location;
+            document.getElementById('modal-start-date').textContent = mission.startDate;
+            document.getElementById('modal-description').textContent = mission.description;
+            
+            // Update skills
+            const skillsContainer = document.getElementById('modal-skills');
+            skillsContainer.innerHTML = '';
+            mission.skills.forEach(skill => {
+                const skillElement = document.createElement('span');
+                skillElement.className = 'px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full';
+                skillElement.textContent = skill;
+                skillsContainer.appendChild(skillElement);
+            });
+            
+            // Update like button
+            const likeBtn = document.getElementById('modal-like-btn');
+            if (likedMissions.has(mission.id)) {
+                likeBtn.innerHTML = '<i data-lucide="heart" class="w-6 h-6 fill-red-500 text-red-500"></i>';
+            } else {
+                likeBtn.innerHTML = '<i data-lucide="heart" class="w-6 h-6"></i>';
+            }
+            
+            // Show modal
+            document.getElementById('mission-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('mission-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function toggleMissionLike() {
+            if (!selectedMission) return;
+            
+            if (likedMissions.has(selectedMission.id)) {
+                likedMissions.delete(selectedMission.id);
+                document.getElementById('modal-like-btn').innerHTML = '<i data-lucide="heart" class="w-6 h-6"></i>';
+            } else {
+                likedMissions.add(selectedMission.id);
+                document.getElementById('modal-like-btn').innerHTML = '<i data-lucide="heart" class="w-6 h-6 fill-red-500 text-red-500"></i>';
+            }
+            
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
